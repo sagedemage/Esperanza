@@ -1,11 +1,12 @@
 ﻿using SDL2;
 using System;
+using System.Runtime.InteropServices;
 
 class Program
 {
     const int WINDOW_WIDTH = 640;
     const int WINDOW_HEIGHT = 480;
-    const float PLAYER_SPEED = 2.5f;
+    const float PLAYER_SPEED = 1.5f;
     public static void Main(String[] args)
     {
         // Initialize SDL
@@ -59,21 +60,30 @@ class Program
                     case SDL.SDL_EventType.SDL_KEYDOWN:
                         switch (e.key.keysym.scancode)
                         {
-                            case SDL.SDL_Scancode.SDL_SCANCODE_A:
-                                rect.x -= PLAYER_SPEED;
-                                break;
-                            case SDL.SDL_Scancode.SDL_SCANCODE_D:
-                                rect.x += PLAYER_SPEED;
-                                break;
-                            case SDL.SDL_Scancode.SDL_SCANCODE_W:
-                                rect.y -= PLAYER_SPEED;
-                                break;
-                            case SDL.SDL_Scancode.SDL_SCANCODE_S:
-                                rect.y += PLAYER_SPEED;
+                            case SDL.SDL_Scancode.SDL_SCANCODE_ESCAPE:
+                                quit = true;
                                 break;
                         }
                         break;
                 }
+            }
+
+            // Hold keybindings
+            if (getKey(SDL.SDL_Scancode.SDL_SCANCODE_A) == true)
+            {
+                rect.x -= PLAYER_SPEED;
+            }
+            else if (getKey(SDL.SDL_Scancode.SDL_SCANCODE_D) == true)
+            {
+                rect.x += PLAYER_SPEED;
+            }
+            else if (getKey(SDL.SDL_Scancode.SDL_SCANCODE_W) == true)
+            {
+                rect.y -= PLAYER_SPEED;
+            }
+            else if (getKey(SDL.SDL_Scancode.SDL_SCANCODE_S) == true)
+            {
+                rect.y += PLAYER_SPEED;
             }
 
             playerBoundary(ref rect);
@@ -123,5 +133,26 @@ class Program
             // top boundary
             rect.y = 0;
         }
+    }
+
+    static bool getKey(SDL.SDL_Scancode scancode)
+    {
+        /*
+        Copy the integer pointer of the array of key states from SDL.SDL_GetKeyboardState
+        to the keys byte array called keys.
+        */
+        int array_size;
+
+        // Return value of the SDL_GetKeyboardState() function:
+        // (const Uint8 *) Returns a pointer to an array of key states.
+        nint orig_array = SDL.SDL_GetKeyboardState(out array_size);
+        byte[] keys = new byte[array_size];
+        Marshal.Copy(orig_array, keys, 0, array_size);
+
+        // Check if the key is pressed
+        byte scancode_byte = (byte)scancode;
+        bool is_key_pressed = keys[scancode_byte] == 1;
+
+        return is_key_pressed;
     }
 }
