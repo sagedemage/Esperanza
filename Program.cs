@@ -139,7 +139,7 @@ class Program
     {
         /*
         Copy the integer pointer of the array of key states from SDL.SDL_GetKeyboardState
-        to the keys byte array called keys.
+        to the keys byte array.
         */
         int array_size;
 
